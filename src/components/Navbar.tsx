@@ -18,7 +18,7 @@ export default function Navbar() {
             <>
               <span className="text-sm">Bem-vindo, {user.name}</span>
               <Button variant="ghost" asChild>
-                <Link href="/dashboard">Dashboard</Link>
+                <Link href="/orders">Meus Pedidos</Link>
               </Button>
               <Button variant="ghost" onClick={logout}>
                 Sair

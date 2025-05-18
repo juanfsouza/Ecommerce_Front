@@ -1,25 +1,33 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
+import api from '@/lib/api';
+import { AxiosError } from 'axios';
 
-export default function LoginPage() {
-  const { login } = useAuth();
+export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await login({ email, password });
+      await api.post('/auth/request-password-reset', { email });
+      setSuccess('E-mail de redefinição enviado. Verifique sua caixa de entrada.');
+      setError('');
+      setEmail('');
     } catch (err) {
-      setError('Credenciais inválidas');
+      if (err instanceof AxiosError && err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError('Erro ao solicitar redefinição. Tente novamente.');
+      }
+      setSuccess('');
     }
   };
 
@@ -27,7 +35,7 @@ export default function LoginPage() {
     <div className="container mx-auto py-8 flex justify-center">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Login</CardTitle>
+          <CardTitle>Recuperar Senha</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -41,31 +49,16 @@ export default function LoginPage() {
                 required
               />
             </div>
-            <div>
-              <Label htmlFor="password">Senha</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
             {error && <p className="text-red-500">{error}</p>}
+            {success && <p className="text-green-500">{success}</p>}
             <Button type="submit" className="w-full">
-              Entrar
+              Enviar Link de Redefinição
             </Button>
           </form>
           <p className="mt-4 text-center">
-            Não tem uma conta?{' '}
-            <Link href="/register" className="text-blue-500 hover:underline">
-              Registre-se
-            </Link>
-          </p>
-          <p className="mt-2 text-center">
-            Esqueceu sua senha?{' '}
-            <Link href="/forgot-password" className="text-blue-500 hover:underline">
-              Recuperar Senha
+            Voltar para{' '}
+            <Link href="/login" className="text-blue-500 hover:underline">
+              Login
             </Link>
           </p>
         </CardContent>

@@ -22,7 +22,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    // Verificar se há um token ao carregar o app
     const token = Cookies.get('token');
     if (token) {
       api
@@ -30,7 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((response) => {
-          setUser({ id: response.data.id, email: response.data.email, name: response.data.name });
+          setUser(response.data);
         })
         .catch(() => {
           Cookies.remove('token');
@@ -46,18 +45,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (credentials: LoginCredentials) => {
     const response = await api.post('/auth/login', credentials);
     const { access_token } = response.data;
-    Cookies.set('token', access_token, { expires: 1 }); // Expira em 1 dia
+    Cookies.set('token', access_token, { expires: 1 });
     const profileResponse = await api.get('/auth/profile', {
       headers: { Authorization: `Bearer ${access_token}` },
     });
     setUser(profileResponse.data);
-    router.push('/dashboard');
+    router.push('/'); // Redireciona para a página inicial
   };
 
   const register = async (credentials: RegisterCredentials) => {
-    await api.post('/auth/register', credentials);
-    // Após registro, fazer login automaticamente
-    await login({ email: credentials.email, password: credentials.password });
+    const response = await api.post('/auth/register', credentials);
+    router.push('/login'); // Redireciona para a página de login
   };
 
   const logout = () => {

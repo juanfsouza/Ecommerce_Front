@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
+import { AxiosError } from 'axios';
 
 export default function RegisterPage() {
   const { register } = useAuth();
@@ -14,13 +15,24 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await register({ name, email, password });
+      setSuccess('Conta criada com sucesso! Faça login para continuar.');
+      setError('');
+      setName('');
+      setEmail('');
+      setPassword('');
     } catch (err) {
-      setError('Erro ao registrar. Tente novamente.');
+      if (err instanceof AxiosError && err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError('Erro ao registrar. Tente novamente.');
+      }
+      setSuccess('');
     }
   };
 
@@ -63,6 +75,7 @@ export default function RegisterPage() {
               />
             </div>
             {error && <p className="text-red-500">{error}</p>}
+            {success && <p className="text-green-500">{success}</p>}
             <Button type="submit" className="w-full">
               Registrar
             </Button>
