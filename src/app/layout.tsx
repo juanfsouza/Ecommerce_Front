@@ -17,8 +17,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  console.log('RootLayout renderizado');
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" className="dark">
       <body className={inter.className}>
         <AuthProvider>
           <CartProvider>
