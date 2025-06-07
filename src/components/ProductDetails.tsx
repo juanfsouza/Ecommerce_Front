@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -15,6 +16,9 @@ interface ProductDetailsProps {
 }
 
 export default function ProductDetails({ product, relatedProducts }: ProductDetailsProps) {
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const sizes = product.size ? product.size.split(', ').map((s) => s.trim()) : [];
+
   return (
     <div className="container mx-auto py-8 text-black">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -23,7 +27,7 @@ export default function ProductDetails({ product, relatedProducts }: ProductDeta
           <Card className="border-none rounded-xl overflow-hidden">
             <CardContent className="p-4">
               <Image
-                src={product.imageUrl}
+                src={product.imageUrl || 'https://placehold.co/400x400'}
                 alt={product.name}
                 width={400}
                 height={400}
@@ -37,7 +41,7 @@ export default function ProductDetails({ product, relatedProducts }: ProductDeta
                 {[1, 2, 3].map((_, index) => (
                   <Image
                     key={index}
-                    src={product.imageUrl}
+                    src={product.imageUrl || 'https://placehold.co/80x80'}
                     alt={`Miniatura ${index + 1}`}
                     width={80}
                     height={80}
@@ -69,17 +73,47 @@ export default function ProductDetails({ product, relatedProducts }: ProductDeta
             <CardContent className="p-6">
               <p className="text-lg font-bold text-orange-500">R$ {product.price.toFixed(2)}</p>
               <p className="text-sm text-gray-400 mt-1">Em estoque: {product.stock}</p>
-              {product.size && <p className="text-sm text-gray-400 mt-1">Tamanho: {product.size}</p>}
+              {product.size && (
+                <div className="mt-2">
+                  <label className="text-sm text-gray-400">Tamanho:</label>
+                  <select
+                    className="ml-2 p-1 border rounded"
+                    value={selectedSize || ''}
+                    onChange={(e) => setSelectedSize(e.target.value)}
+                  >
+                    <option value="" disabled>
+                      Selecione um tamanho
+                    </option>
+                    {sizes.map((size) => (
+                      <option key={size} value={size}>
+                        {size}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              {product.material && <p className="text-sm text-gray-400 mt-1">Material: {product.material}</p>}
+              {product.type && <p className="text-sm text-gray-400 mt-1">Tipo: {product.type}</p>}
               <div className="flex items-center space-x-4 mt-4">
                 <Button
                   className="bg-black text-white hover:bg-gray-700 transition-colors"
-                  onClick={() => alert('Funcionalidade temporariamente desativada')}
+                  disabled={product.size && !selectedSize}
+                  onClick={() =>
+                    alert(
+                      `Adicionado ao carrinho: ${product.name}${selectedSize ? `, Tamanho: ${selectedSize}` : ''}`,
+                    )
+                  }
                 >
                   Adicionar ao Carrinho
                 </Button>
                 <Button
                   className="bg-orange-500 text-white hover:bg-orange-600 transition-colors"
-                  onClick={() => alert('Funcionalidade temporariamente desativada')}
+                  disabled={product.size && !selectedSize}
+                  onClick={() =>
+                    alert(
+                      `Compra iniciada: ${product.name}${selectedSize ? `, Tamanho: ${selectedSize}` : ''}`,
+                    )
+                  }
                 >
                   Comprar Agora
                 </Button>
@@ -94,6 +128,12 @@ export default function ProductDetails({ product, relatedProducts }: ProductDeta
                 </TabsList>
                 <TabsContent value="description">
                   <p className="text-gray-500">{product.description || 'Sem descrição disponível.'}</p>
+                  {product.about && (
+                    <div className="mt-4">
+                      <h3 className="font-semibold">Sobre o Produto</h3>
+                      <p className="text-gray-500">{product.about}</p>
+                    </div>
+                  )}
                 </TabsContent>
                 <TabsContent value="reviews">
                   <div className="space-y-4">
@@ -126,16 +166,20 @@ export default function ProductDetails({ product, relatedProducts }: ProductDeta
                       <AccordionTrigger>Especificações</AccordionTrigger>
                       <AccordionContent>
                         <ul className="list-disc pl-5 text-gray-500">
-                          <li>Material: Algodão</li>
-                          <li>Peso: 500g</li>
-                          <li>Origem: Nacional</li>
+                          {product.material && <li>Material: {product.material}</li>}
+                          {product.type && <li>Tipo: {product.type}</li>}
+                          {product.size && <li>Tamanho: {product.size}</li>}
+                          <li>Peso: 500g</li> {/* Ajuste conforme necessário */}
+                          <li>Origem: Nacional</li> {/* Ajuste conforme necessário */}
                         </ul>
                       </AccordionContent>
                     </AccordionItem>
                     <AccordionItem value="item-2">
                       <AccordionTrigger>Garantia</AccordionTrigger>
                       <AccordionContent>
-                        <p className="text-gray-500">Garantia de 1 ano contra defeitos de fabricação.</p>
+                        <p className="text-gray-500">
+                          {product.warranty || 'Garantia de 1 ano contra defeitos de fabricação.'}
+                        </p>
                       </AccordionContent>
                     </AccordionItem>
                   </Accordion>

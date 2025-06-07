@@ -89,13 +89,13 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-zinc-900 text-white">
       <section className="relative w-full h-[500px] mb-12">
         <Carousel className="w-full h-full">
           <CarouselContent>
             {bannerSlides.map((slide, index) => (
               <CarouselItem key={index}>
-                <div className="relative w-full h-[500px]">
+                <div className="relative w-full h-[500px] bg-cover bg-">
                   <Image
                     src={slide.image}
                     alt={slide.title}
@@ -142,19 +142,20 @@ export default function Home() {
                 className="border-none hover:shadow-md transition-all duration-300 rounded-xl overflow-hidden"
               >
                 <CardHeader className="p-0">
-                  <Image
-                    src={product.imageUrl}
-                    alt={product.name}
-                    width={300}
-                    height={300}
-                    className="object-cover w-full h-48"
-                    onError={(e) => {
-                      e.currentTarget.src = 'https://placehold.co/300x300';
-                    }}
-                    unoptimized
-                  />
+                  <div className="relative w-full aspect-[4/3]">
+                    <Image
+                      src={product.imageUrl}
+                      alt={product.name}
+                      fill
+                      className="rounded-t-2xl"
+                      onError={(e) => {
+                        e.currentTarget.src = 'https://placehold.co/300x300';
+                      }}
+                      unoptimized
+                    />
+                  </div>
                 </CardHeader>
-                <CardContent className="p-4">
+                <CardContent className="p-4 h-40">
                   <CardTitle className="text-lg font-semibold text-white line-clamp-1">
                     {product.name}
                   </CardTitle>

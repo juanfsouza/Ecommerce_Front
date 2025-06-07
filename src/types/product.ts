@@ -2,14 +2,16 @@ export interface Product {
   id: number;
   name: string;
   description?: string | null;
-  imageUrl: string;
   price: number;
   stock: number;
+  imageUrl?: string | null;
+  stripeProductId?: string | null;
+  stripePriceId?: string | null;
   size?: string | null;
-  stripeProductId?: string;
-  stripePriceId?: string;
-  images?: string[];
-  specifications?: { key: string; value: string }[];
+  material?: string | null;
+  type?: string | null;
+  about?: string | null;
+  warranty?: string | null;
   createdAt: string;
   updatedAt: string;
 }
